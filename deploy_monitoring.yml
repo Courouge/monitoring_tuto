@@ -1,0 +1,17 @@
+---
+- hosts: localhost
+  gather_facts: yes
+  tasks:
+    - pause:
+        seconds: 10
+    - local_action: shell date +"%s"
+      register: ts
+    - name: Create a global annotation from Ansible
+      grafana_annotations:
+        url: "http://localhost:3000/api/annotations"
+        url_username: "admin"
+        url_password: "admin"
+        tags: ["update-monitoring_conf"]
+        tstamp: "{{ ansible_date_time.epoch |int }}"
+        end_tstamp: "{{ ts.stdout |int }}"
+        text: "Execution of deploy_monitoring.yml on {{ inventory_file }} with ansible {{ ansible_version.full }}"
